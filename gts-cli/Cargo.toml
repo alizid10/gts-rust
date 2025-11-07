@@ -1,0 +1,29 @@
+[package]
+name = "gts-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Global Type System (GTS) CLI and HTTP server"
+
+[[bin]]
+name = "gts"
+path = "src/main.rs"
+
+[dependencies]
+gts = { path = "../gts" }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+atty.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
