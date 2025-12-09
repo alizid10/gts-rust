@@ -475,7 +475,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "jsonschema",
- "regex",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -513,17 +512,9 @@ version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "serde_json",
- "syn",
-]
-
-[[package]]
-name = "gts-macros-test"
-version = "0.1.0"
-dependencies = [
- "gts-macros",
  "serde",
  "serde_json",
+ "syn",
 ]
 
 [[package]]

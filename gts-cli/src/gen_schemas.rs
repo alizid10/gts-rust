@@ -31,12 +31,8 @@ pub fn generate_schemas_from_rust(source: &str, output: Option<&str>) -> Result<
             files_scanned += 1;
             if let Ok(content) = fs::read_to_string(path) {
                 // Parse the file and extract schema information
-                let results = extract_and_generate_schemas(
-                    &content,
-                    output,
-                    &source_canonical,
-                    path,
-                )?;
+                let results =
+                    extract_and_generate_schemas(&content, output, &source_canonical, path)?;
                 schemas_generated += results.len();
                 for (schema_id, file_path) in results {
                     println!("  Generated schema: {} @ {}", schema_id, file_path);
@@ -66,8 +62,11 @@ fn extract_and_generate_schemas(
 ) -> Result<Vec<(String, String)>> {
     // Regex to find struct_to_gts_schema annotations
     let re = Regex::new(
-        r#"(?s)#\[struct_to_gts_schema\(\s*file_path\s*=\s*"([^"]+)"\s*,\s*schema_id\s*=\s*"([^"]+)"\s*,\s*description\s*=\s*"([^"]+)"\s*,\s*properties\s*=\s*"([^"]+)"\s*\)\]\s*(?:pub\s+)?struct\s+(\w+)\s*\{([^}]+)\}"#
+        r#"(?s)#\[struct_to_gts_schema\(\s*file_path\s*=\s*"([^"]+)"\s*,\s*schema_id\s*=\s*"([^"]+)"\s*,\s*description\s*=\s*"([^"]+)"\s*,\s*properties\s*=\s*"([^"]+)"\s*\)\]\s*(?:pub\s+)?struct\s+(\w+)\s*\{([^}]+)\}"#,
     )?;
+
+    // Pre-compile field regex outside the loop
+    let field_re = Regex::new(r"(?m)^\s*(?:pub\s+)?(\w+)\s*:\s*([^,]+?)(?:,|\s*$)")?;
 
     let mut results = Vec::new();
 
@@ -127,7 +126,6 @@ fn extract_and_generate_schemas(
         let properties: Vec<&str> = properties_str.split(',').map(|s| s.trim()).collect();
 
         // Parse struct fields
-        let field_re = Regex::new(r"(?m)^\s*(?:pub\s+)?(\w+)\s*:\s*([^,]+?)(?:,|\s*$)")?;
         let mut field_types = HashMap::new();
 
         for field_cap in field_re.captures_iter(struct_body) {
@@ -137,7 +135,13 @@ fn extract_and_generate_schemas(
         }
 
         // Build JSON schema
-        let schema = build_json_schema(schema_id, struct_name, description, &properties, &field_types)?;
+        let schema = build_json_schema(
+            schema_id,
+            struct_name,
+            description,
+            &properties,
+            &field_types,
+        )?;
 
         // Create parent directories
         if let Some(parent) = output_path.parent() {

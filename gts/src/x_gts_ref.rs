@@ -84,7 +84,6 @@
 /// ```
 ///
 /// In this case, the `type` field must match the schema's `$id` value.
-
 use serde_json::Value;
 use std::fmt;
 
@@ -123,16 +122,13 @@ impl fmt::Display for XGtsRefValidationError {
 impl std::error::Error for XGtsRefValidationError {}
 
 /// Validator for x-gts-ref constraints in GTS schemas
+#[derive(Debug, Clone, Copy, Default)]
 pub struct XGtsRefValidator;
 
 impl XGtsRefValidator {
     /// Create a new validator
+    #[must_use]
     pub fn new() -> Self {
-        Self
-    }
-
-    /// Create a default validator
-    pub fn default() -> Self {
         Self
     }
 
@@ -174,7 +170,9 @@ impl XGtsRefValidator {
         if let Some(x_gts_ref) = sch_obj.get("x-gts-ref") {
             if let Some(inst_str) = inst.as_str() {
                 if let Some(ref_pattern) = x_gts_ref.as_str() {
-                    if let Some(error) = self.validate_ref_value(inst_str, ref_pattern, path, root_schema) {
+                    if let Some(error) =
+                        self.validate_ref_value(inst_str, ref_pattern, path, root_schema)
+                    {
                         errors.push(error);
                     }
                 }
@@ -194,7 +192,13 @@ impl XGtsRefValidator {
                                     } else {
                                         format!("{}.{}", path, prop_name)
                                     };
-                                    self.visit_instance(prop_value, prop_schema, root_schema, &prop_path, errors);
+                                    self.visit_instance(
+                                        prop_value,
+                                        prop_schema,
+                                        root_schema,
+                                        &prop_path,
+                                        errors,
+                                    );
                                 }
                             }
                         }
@@ -264,10 +268,7 @@ impl XGtsRefValidator {
                     ref_path,
                     format!("{:?}", x_gts_ref),
                     String::new(),
-                    format!(
-                        "x-gts-ref value must be a string, got {}",
-                        x_gts_ref.to_string()
-                    ),
+                    format!("x-gts-ref value must be a string, got {}", x_gts_ref),
                 ));
             }
         }
@@ -445,8 +446,7 @@ impl XGtsRefValidator {
         // Check pattern match
         if pattern == "gts.*" {
             // Any valid GTS ID matches
-        } else if pattern.ends_with('*') {
-            let prefix = &pattern[..pattern.len() - 1];
+        } else if let Some(prefix) = pattern.strip_suffix('*') {
             if !value.starts_with(prefix) {
                 return Some(XGtsRefValidationError::new(
                     field_path.to_string(),
@@ -478,6 +478,7 @@ impl XGtsRefValidator {
     ///
     /// # Returns
     /// The resolved value as a string or None if not found
+    #[allow(clippy::only_used_in_recursion)]
     fn resolve_pointer(&self, schema: &Value, pointer: &str) -> Option<String> {
         let path = pointer.trim_start_matches('/');
         if path.is_empty() {
@@ -534,11 +535,8 @@ mod tests {
     #[test]
     fn test_validate_gts_pattern_wildcard() {
         let validator = XGtsRefValidator::new();
-        let result = validator.validate_gts_pattern(
-            "gts.x.core.events.topic.v1~",
-            "gts.*",
-            "test_field",
-        );
+        let result =
+            validator.validate_gts_pattern("gts.x.core.events.topic.v1~", "gts.*", "test_field");
         assert!(result.is_none());
     }
 

@@ -176,7 +176,7 @@ async fn get_entities(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.get_entities(params.limit);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn get_entity(
@@ -185,7 +185,7 @@ async fn get_entity(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.get_entity(&gts_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn add_entity(
@@ -195,7 +195,7 @@ async fn add_entity(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.add_entity(body, params.validate);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn add_entities(
@@ -204,7 +204,7 @@ async fn add_entities(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.add_entities(body);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn add_schema(
@@ -213,7 +213,7 @@ async fn add_schema(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.add_schema(body.type_id, body.schema_content);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn validate_id(
@@ -222,13 +222,13 @@ async fn validate_id(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.validate_id(&params.gts_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn extract_id(State(state): State<AppState>, Json(body): Json<Value>) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.extract_id(body);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn parse_id(
@@ -237,7 +237,7 @@ async fn parse_id(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.parse_id(&params.gts_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn match_id_pattern(
@@ -246,7 +246,7 @@ async fn match_id_pattern(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.match_id_pattern(&params.candidate, &params.pattern);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn id_to_uuid(
@@ -255,7 +255,7 @@ async fn id_to_uuid(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.uuid(&params.gts_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn validate_instance(
@@ -264,7 +264,7 @@ async fn validate_instance(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.validate_instance(&body.instance_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn schema_graph(
@@ -273,7 +273,7 @@ async fn schema_graph(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.schema_graph(&params.gts_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn compatibility(
@@ -282,13 +282,13 @@ async fn compatibility(
 ) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.compatibility(&params.old_schema_id, &params.new_schema_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn cast(State(state): State<AppState>, Json(body): Json<CastRequest>) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.cast(&body.instance_id, &body.to_schema_id);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn query(
@@ -297,11 +297,11 @@ async fn query(
 ) -> impl IntoResponse {
     let ops = state.ops.lock().unwrap();
     let result = ops.query(&params.expr, params.limit);
-    Json(result.to_dict())
+    Json(result)
 }
 
 async fn attr(State(state): State<AppState>, Query(params): Query<AttrQuery>) -> impl IntoResponse {
     let mut ops = state.ops.lock().unwrap();
     let result = ops.attr(&params.gts_with_path);
-    Json(result.to_dict())
+    Json(result)
 }

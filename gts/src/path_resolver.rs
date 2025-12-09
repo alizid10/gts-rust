@@ -84,6 +84,7 @@ impl JsonPathResolver {
         parts
     }
 
+    #[allow(clippy::only_used_in_recursion)]
     fn list_available(&self, node: &Value, prefix: &str, out: &mut Vec<String>) {
         match node {
             Value::Object(map) => {
@@ -211,30 +212,6 @@ impl JsonPathResolver {
         self.error = Some(error.to_string());
         self.available_fields = Some(Vec::new());
         self
-    }
-
-    pub fn to_dict(&self) -> serde_json::Map<String, Value> {
-        let mut ret = serde_json::Map::new();
-        ret.insert("gts_id".to_string(), Value::String(self.gts_id.clone()));
-        ret.insert("path".to_string(), Value::String(self.path.clone()));
-        ret.insert(
-            "value".to_string(),
-            self.value.clone().unwrap_or(Value::Null),
-        );
-        ret.insert("resolved".to_string(), Value::Bool(self.resolved));
-
-        if let Some(ref error) = self.error {
-            ret.insert("error".to_string(), Value::String(error.clone()));
-        }
-
-        if let Some(ref fields) = self.available_fields {
-            ret.insert(
-                "available_fields".to_string(),
-                Value::Array(fields.iter().map(|s| Value::String(s.clone())).collect()),
-            );
-        }
-
-        ret
     }
 }
 

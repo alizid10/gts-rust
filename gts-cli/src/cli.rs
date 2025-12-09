@@ -1,7 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use gts::GtsOps;
-use serde_json::Value;
 use std::io::Write;
 
 use crate::gen_schemas::generate_schemas_from_rust;
@@ -164,53 +163,53 @@ pub async fn run() -> Result<()> {
         }
         Commands::ValidateId { gts_id } => {
             let result = ops.validate_id(&gts_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::ParseId { gts_id } => {
             let result = ops.parse_id(&gts_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::MatchIdPattern { pattern, candidate } => {
             let result = ops.match_id_pattern(&candidate, &pattern);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::Uuid { gts_id, scope: _ } => {
             let result = ops.uuid(&gts_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::ValidateInstance { gts_id } => {
             let result = ops.validate_instance(&gts_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::ResolveRelationships { gts_id } => {
             let result = ops.schema_graph(&gts_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::Compatibility {
             old_schema_id,
             new_schema_id,
         } => {
             let result = ops.compatibility(&old_schema_id, &new_schema_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::Cast {
             from_id,
             to_schema_id,
         } => {
             let result = ops.cast(&from_id, &to_schema_id);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::Query { expr, limit } => {
             let result = ops.query(&expr, limit);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::Attr { gts_with_path } => {
             let result = ops.attr(&gts_with_path);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::List { limit } => {
             let result = ops.get_entities(limit);
-            print_json(&Value::Object(result.to_dict()))?;
+            print_result(&result)?;
         }
         Commands::GenerateFromRust { source, output } => {
             generate_schemas_from_rust(&source, output.as_deref())?;
@@ -220,7 +219,7 @@ pub async fn run() -> Result<()> {
     Ok(())
 }
 
-fn print_json(value: &Value) -> Result<()> {
+fn print_result<T: serde::Serialize>(value: &T) -> Result<()> {
     let stdout = std::io::stdout();
     let mut handle = stdout.lock();
     serde_json::to_writer_pretty(&mut handle, value)?;

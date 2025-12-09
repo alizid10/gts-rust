@@ -9,9 +9,14 @@ description = "Procedural macros for GTS schema generation"
 
 [lib]
 proc-macro = true
+test = false
 
 [dependencies]
 syn = { version = "2.0", features = ["full", "extra-traits"] }
 quote = "1.0"
 proc-macro2 = "1.0"
+serde_json.workspace = true
+
+[dev-dependencies]
+serde.workspace = true
 serde_json.workspace = true

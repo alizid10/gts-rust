@@ -30,12 +30,10 @@ impl Parse for GtsSchemaArgs {
                 "schema_id" => schema_id = Some(value.value()),
                 "description" => description = Some(value.value()),
                 "properties" => properties = Some(value.value()),
-                _ => {
-                    return Err(syn::Error::new_spanned(
-                        key,
-                        "Unknown attribute. Expected: file_path, schema_id, description, or properties",
-                    ))
-                }
+                _ => return Err(syn::Error::new_spanned(
+                    key,
+                    "Unknown attribute. Expected: file_path, schema_id, description, or properties",
+                )),
             }
 
             if input.peek(Token![,]) {
@@ -44,10 +42,14 @@ impl Parse for GtsSchemaArgs {
         }
 
         Ok(GtsSchemaArgs {
-            file_path: file_path.ok_or_else(|| input.error("Missing required attribute: file_path"))?,
-            schema_id: schema_id.ok_or_else(|| input.error("Missing required attribute: schema_id"))?,
-            description: description.ok_or_else(|| input.error("Missing required attribute: description"))?,
-            properties: properties.ok_or_else(|| input.error("Missing required attribute: properties"))?,
+            file_path: file_path
+                .ok_or_else(|| input.error("Missing required attribute: file_path"))?,
+            schema_id: schema_id
+                .ok_or_else(|| input.error("Missing required attribute: schema_id"))?,
+            description: description
+                .ok_or_else(|| input.error("Missing required attribute: description"))?,
+            properties: properties
+                .ok_or_else(|| input.error("Missing required attribute: properties"))?,
         })
     }
 }
@@ -141,9 +143,12 @@ pub fn struct_to_gts_schema(attr: TokenStream, item: TokenStream) -> TokenStream
             }
         },
         _ => {
-            return syn::Error::new_spanned(&input.ident, "struct_to_gts_schema: Only structs are supported")
-                .to_compile_error()
-                .into()
+            return syn::Error::new_spanned(
+                &input.ident,
+                "struct_to_gts_schema: Only structs are supported",
+            )
+            .to_compile_error()
+            .into()
         }
     };
 
